@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MEGASTORE — Magazin online (machetă demo)</title>
+<meta name="description" content="MEGASTORE – machetă demo de magazin online cu 2.000 de produse generate automat, filtre, căutare, mega-meniu și coș.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23111827'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='800' font-size='17' text-anchor='middle' fill='%232563eb'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="preload" href="/img/i2-400.webp" as="image" type="image/webp" fetchpriority="high">
+<link rel="stylesheet" href="/css/style.css">
+<script src="/js/app.js" defer></script>
+</head>
+<body>
+<div class="demo-banner" role="note">Machetă demo – produse, branduri și prețuri inventate</div>
+<header class="site-header">
+  <div class="hrow">
+    <a class="logo" href="/" data-link aria-label="MEGASTORE – pagina principală">MEGA<b>STORE</b></a>
+    <form class="search" id="searchForm" role="search" autocomplete="off">
+      <input id="q" type="search" placeholder="Caută în 2.000 de produse…" aria-label="Caută produse" autocomplete="off" enterkeyhint="search">
+      <div class="sugg" id="sugg" role="listbox" aria-label="Sugestii"></div>
+    </form>
+    <a class="cart" id="cartb" href="/cos" data-link aria-label="Coșul meu">Coș <span id="cc">0</span></a>
+  </div>
+  <nav class="mega" id="mega" aria-label="Categorii"></nav>
+  <div class="mega-panel" id="megaPanel" hidden></div>
+</header>
+
+<div id="viewShop" class="wrap">
+  <aside id="filters" aria-label="Filtre">
+    <div class="f-head"><b>Filtre</b><button type="button" class="f-close" id="fclose" aria-label="Închide filtrele">×</button></div>
+    <div class="f-body">
+      <h3>Categorie</h3><div id="fc"></div>
+      <h3>Preț (lei)</h3>
+      <div class="pr"><input id="pmin" type="number" inputmode="numeric" min="0" placeholder="min" aria-label="Preț minim"><input id="pmax" type="number" inputmode="numeric" min="0" placeholder="max" aria-label="Preț maxim"></div>
+      <h3>Brand</h3><div id="fb"></div>
+      <h3>Rating</h3><div id="fr"></div>
+      <h3>Altele</h3>
+      <label><span class="lbl"><input type="checkbox" id="fsale"> Doar reduceri</span></label>
+      <label><span class="lbl"><input type="checkbox" id="fstock"> Doar în stoc</span></label>
+    </div>
+    <div class="f-foot"><button type="button" class="btn-ghost" id="freset">Resetează</button><button type="button" class="btn" id="fapply">Vezi produsele</button></div>
+  </aside>
+  <div class="f-overlay" id="foverlay" hidden></div>
+  <main id="main">
+    <div class="tools">
+      <b id="cnt" aria-live="polite">2.000 de produse</b>
+      <div class="tools-r">
+        <button type="button" class="f-open" id="fopen" aria-controls="filters">Filtre <span id="fnum"></span></button>
+        <select id="sort" aria-label="Sortare">
+          <option value="pop">Cele mai populare</option>
+          <option value="asc">Preț crescător</option>
+          <option value="desc">Preț descrescător</option>
+          <option value="rate">Rating</option>
+          <option value="new">Noutăți</option>
+        </select>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+    <div class="more" id="more"></div>
+  </main>
+</div>
+
+<div id="viewCart" class="cartpage" hidden>
+  <h1>Coșul tău</h1>
+  <div class="cart-wrap">
+    <section class="cart-list" id="cartList" aria-label="Produse în coș"></section>
+    <aside class="summary" id="summary" aria-label="Sumar comandă"></aside>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>MEGASTORE · Machetă demo · 2.000 de produse generate automat, cu nume, branduri și prețuri inventate · Site realizat de CristianWeb</p>
+  <a class="cta" href="https://cristianweb.ro" rel="noopener">Vreau un site ca acesta →</a>
+</footer>
+
+<div class="qv" id="qv" role="dialog" aria-modal="true" aria-labelledby="qn" hidden>
+  <div class="box">
+    <button type="button" class="x" id="qx" aria-label="Închide">×</button>
+    <div class="qv-main">
+      <div class="qv-img"><img id="qi" alt="" width="400" height="400"><span class="badge" id="qbadge" hidden></span></div>
+      <div class="qv-info">
+        <div class="br" id="qb"></div>
+        <h2 id="qn"></h2>
+        <div id="qs" class="st"></div>
+        <div class="price big"><b id="qp"></b><s id="qo"></s><span class="save" id="qsave"></span></div>
+        <div class="stock" id="qstock"></div>
+        <p id="qd" class="muted"></p>
+        <div class="buy">
+          <div class="qty" role="group" aria-label="Cantitate">
+            <button type="button" data-step="-1" aria-label="Scade cantitatea">−</button>
+            <input id="qqty" type="number" min="1" value="1" inputmode="numeric" aria-label="Cantitate">
+            <button type="button" data-step="1" aria-label="Crește cantitatea">+</button>
+          </div>
+          <button type="button" class="btn" id="qa">Adaugă în coș</button>
+        </div>
+        <p class="muted small" id="qincart"></p>
+      </div>
+    </div>
+    <div class="similar">
+      <h3>Produse similare</h3>
+      <div class="sim-grid" id="qsim"></div>
+    </div>
+  </div>
+</div>
+
+<div class="qv" id="done" role="dialog" aria-modal="true" aria-labelledby="doneT" hidden>
+  <div class="box done-box">
+    <div class="done-ic" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h2 id="doneT">Comandă demo înregistrată</h2>
+    <p><b>Aceasta este o machetă – nu s-a trimis nicio comandă.</b></p>
+    <p class="muted">Nu s-au colectat date personale sau de plată. Într-un magazin real, aici ar urma confirmarea pe e-mail și detaliile de livrare.</p>
+    <div class="done-act"><button type="button" class="btn-ghost" id="doneClose">Închide</button><button type="button" class="btn" id="doneClear">Golește coșul și continuă</button></div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
