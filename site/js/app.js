@@ -3,8 +3,11 @@
   'use strict';
 
   /* ---------- Generator produse (identic cu modelul original: aceeași sămânță, aceleași rezultate) ---------- */
-  const IMG = n => '/img/i' + (n + 1) + '-400.webp';
-  const IMG_BIG = n => '/img/i' + (n + 1) + '.webp';
+  /* Poza se alege după TIPUL produsului. Doar 8 tipuri au fotografie potrivită;
+     celelalte primesc un placeholder SVG cu iconița și numele tipului (niciodată poza altui produs). */
+  const PHOTO = { 'Căști': 1, 'Smartwatch': 2, 'Espressor': 3, 'Sneakers': 4, 'Rucsac': 5, 'Lampă de birou': 6, 'Blender': 7, 'Scaun ergonomic': 8 };
+  const IMG = p => PHOTO[p.type] ? '/img/i' + PHOTO[p.type] + '-400.webp' : '/img/tip/' + slug(p.type) + '.svg';
+  const IMG_BIG = p => PHOTO[p.type] ? '/img/i' + PHOTO[p.type] + '.webp' : IMG(p);
   const CAT = [
     ['Electronice', [0, 1], ['Căști', 'Smartwatch', 'Boxă', 'Tabletă', 'Încărcător']],
     ['Electrocasnice', [2, 6], ['Espressor', 'Blender', 'Mixer', 'Fierbător', 'Prăjitor']],
@@ -29,8 +32,8 @@
     const c = CAT[Math.floor(r() * CAT.length)], t = c[2][Math.floor(r() * c[2].length)], b = BR[Math.floor(r() * BR.length)],
       base = Math.round((40 + r() * r() * 3500) / 10) * 10 - 1, sale = r() < .28, old = sale ? Math.round(base * (1.15 + r() * .4) / 10) * 10 - 1 : 0;
     const name = t + ' ' + b + ' ' + ADJ[Math.floor(r() * ADJ.length)] + ' ' + COL[Math.floor(r() * COL.length)];
-    const img = c[1][Math.floor(r() * 2)];
-    P.push({ id: i, cat: c[0], type: t, name, brand: b, img, price: base, old, rate: Math.round((3 + r() * 2) * 10) / 10, rev: Math.floor(r() * 900), stock: Math.floor(r() * 40), pop: r(), nw: r() });
+    r(); // apelul păstrat din generatorul original (alegea poza după categorie) – menține identice ratingurile, stocurile etc.
+    P.push({ id: i, cat: c[0], type: t, name, brand: b, price: base, old, rate: Math.round((3 + r() * 2) * 10) / 10, rev: Math.floor(r() * 900), stock: Math.floor(r() * 40), pop: r(), nw: r() });
   }
   P.forEach(p => { p.s = norm(p.name + ' ' + p.brand + ' ' + p.cat); });
 
@@ -139,7 +142,7 @@
   /* ---------- Randare catalog ---------- */
   const card = (p, i) => {
     const eager = i < 4;
-    return `<article class="p">${p.old ? `<span class="badge">-${disc(p)}%</span>` : ''}<button type="button" class="im" data-q="${p.id}" aria-label="Detalii ${p.name}"><img src="${IMG(p.img)}" alt="${p.name}" width="400" height="400" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></button><div class="br">${p.brand} · ${p.cat}</div><h4><a href="/?p=${p.id}" data-q="${p.id}">${p.name}</a></h4><div class="st" aria-label="Rating ${p.rate} din 5">${stars(p.rate)} <span>${p.rate} (${p.rev})</span></div><div class="price"><b>${lei(p.price)}</b>${p.old ? `<s>${lei(p.old)}</s>` : ''}</div><div class="stock ${stockCls(p)}">${stockTxt(p)}</div><button type="button" class="add" data-a="${p.id}" ${p.stock ? '' : 'disabled'}>${p.stock ? 'Adaugă în coș' : 'Indisponibil'}</button></article>`;
+    return `<article class="p">${p.old ? `<span class="badge">-${disc(p)}%</span>` : ''}<button type="button" class="im" data-q="${p.id}" aria-label="Detalii ${p.name}"><img src="${IMG(p)}" alt="${p.name}" width="400" height="400" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></button><div class="br">${p.brand} · ${p.cat}</div><h4><a href="/?p=${p.id}" data-q="${p.id}">${p.name}</a></h4><div class="st" aria-label="Rating ${p.rate} din 5">${stars(p.rate)} <span>${p.rate} (${p.rev})</span></div><div class="price"><b>${lei(p.price)}</b>${p.old ? `<s>${lei(p.old)}</s>` : ''}</div><div class="stock ${stockCls(p)}">${stockTxt(p)}</div><button type="button" class="add" data-a="${p.id}" ${p.stock ? '' : 'disabled'}>${p.stock ? 'Adaugă în coș' : 'Indisponibil'}</button></article>`;
   };
 
   function renderMore() {
@@ -218,7 +221,7 @@
     const best = inCat.filter(p => p.old && p.stock).sort((a, b) => disc(b) - disc(a))[0];
     panel.innerHTML = `<div><h4>${cat}</h4><div class="muted">${produse(inCat.length)}</div><a class="all" href="/?cat=${slug(cat)}" data-pc="${cat}">Vezi toate ›</a></div>` +
       `<div class="types">${c[2].map(t => `<a href="/?cat=${slug(cat)}&tip=${slug(t)}" data-pc="${cat}" data-pt="${t}">${t} <span>${inCat.filter(p => p.type === t).length}</span></a>`).join('')}</div>` +
-      (best ? `<a class="promo" href="/?p=${best.id}" data-q="${best.id}"><img src="${IMG(best.img)}" alt="" width="72" height="72" loading="lazy"><span><span class="badge" style="position:static">-${disc(best)}%</span><b>${best.name}</b>${lei(best.price)} <s class="muted">${lei(best.old)}</s></span></a>` : '');
+      (best ? `<a class="promo" href="/?p=${best.id}" data-q="${best.id}"><img src="${IMG(best)}" alt="" width="72" height="72" loading="lazy"><span><span class="badge" style="position:static">-${disc(best)}%</span><b>${best.name}</b>${lei(best.price)} <s class="muted">${lei(best.old)}</s></span></a>` : '');
     panel.hidden = false;
   }
   $('#mega').addEventListener('mouseover', e => { const b = e.target.closest('button'); if (b) showPanel(b.dataset.c); });
@@ -287,7 +290,7 @@
     if (!words.length) { sg.classList.remove('on'); return; }
     const hits = P.filter(p => words.every(w => p.s.includes(w)));
     const top = hits.slice().sort((a, b) => b.pop - a.pop).slice(0, 6);
-    sg.innerHTML = top.map(p => `<a href="/?p=${p.id}" data-q="${p.id}" role="option"><img src="${IMG(p.img)}" alt="" width="36" height="36"><span>${p.name}<br><b>${lei(p.price)}</b></span></a>`).join('') +
+    sg.innerHTML = top.map(p => `<a href="/?p=${p.id}" data-q="${p.id}" role="option"><img src="${IMG(p)}" alt="" width="36" height="36"><span>${p.name}<br><b>${lei(p.price)}</b></span></a>`).join('') +
       (hits.length ? `<a href="#" class="all" data-all>Vezi toate rezultatele (${num(hits.length)})</a>` : '<a href="#" class="all" data-all>Niciun rezultat</a>');
     sg.classList.toggle('on', document.activeElement === qIn);
   }
@@ -338,7 +341,8 @@
     if (qv.hidden) lastFocus = document.activeElement;
     qId = id;
     const im = $('#qi');
-    im.src = IMG(p.img); im.srcset = IMG(p.img) + ' 400w, ' + IMG_BIG(p.img) + ' 1024w'; im.sizes = '(max-width:640px) 260px, 400px'; im.alt = p.name;
+    im.src = IMG(p);
+    if (PHOTO[p.type]) { im.srcset = IMG(p) + ' 400w, ' + IMG_BIG(p) + ' 1024w'; im.sizes = '(max-width:640px) 260px, 400px'; } else { im.removeAttribute('srcset'); im.removeAttribute('sizes'); } im.alt = p.name;
     const bd = $('#qbadge'); bd.hidden = !p.old; bd.textContent = p.old ? '-' + disc(p) + '%' : '';
     $('#qb').textContent = p.brand + ' · ' + p.cat;
     $('#qn').textContent = p.name;
@@ -350,7 +354,7 @@
     s.textContent = p.stock ? (p.stock < 5 ? 'Ultimele ' + p.stock + ' bucăți în stoc' : 'În stoc · ' + p.stock + ' buc. disponibile') : 'Stoc epuizat';
     $('#qd').textContent = 'Produs demonstrativ (inventat). Într-un magazin real, aici apar descrierea, specificațiile, variantele și termenul de livrare.';
     qqty.value = 1; syncQty();
-    $('#qsim').innerHTML = similar(p).map(x => `<button type="button" class="sim" data-q="${x.id}"><img src="${IMG(x.img)}" alt="" width="400" height="400" loading="lazy"><span>${x.name}</span><b>${lei(x.price)}</b></button>`).join('');
+    $('#qsim').innerHTML = similar(p).map(x => `<button type="button" class="sim" data-q="${x.id}"><img src="${IMG(x)}" alt="" width="400" height="400" loading="lazy"><span>${x.name}</span><b>${lei(x.price)}</b></button>`).join('');
     qv.hidden = false; document.body.classList.add('lock');
     qv.querySelector('.box').scrollTop = 0;
     $('#qx').focus();
@@ -382,7 +386,7 @@
     sum.hidden = false;
     list.innerHTML = items.map(([id, q]) => {
       const p = P[id];
-      return `<div class="ci"><img src="${IMG(p.img)}" alt="${p.name}" width="84" height="84" data-q="${p.id}" loading="lazy">` +
+      return `<div class="ci"><img src="${IMG(p)}" alt="${p.name}" width="84" height="84" data-q="${p.id}" loading="lazy">` +
         `<div><div class="br">${p.brand} · ${p.cat}</div><h3>${p.name}</h3><div class="unit">${lei(p.price)} / buc.${p.old ? ` · <s>${lei(p.old)}</s>` : ''}</div><div class="stock ${stockCls(p)}">${p.stock < 5 ? 'Ultimele ' + p.stock + ' bucăți' : 'În stoc'}</div></div>` +
         `<div class="ci-r"><div class="qty" role="group" aria-label="Cantitate ${p.name}"><button type="button" data-cq="${id}" data-d="-1" aria-label="Scade cantitatea" ${q <= 1 ? 'disabled' : ''}>−</button><input type="number" min="1" max="${p.stock}" value="${q}" data-ci="${id}" inputmode="numeric" aria-label="Cantitate"><button type="button" data-cq="${id}" data-d="1" aria-label="Crește cantitatea" ${q >= p.stock ? 'disabled' : ''}>+</button></div>` +
         `<b>${lei(round2(p.price * q))}</b><button type="button" class="rm" data-rm="${id}">Elimină</button></div></div>`;

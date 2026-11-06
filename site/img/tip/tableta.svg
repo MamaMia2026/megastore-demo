@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400" role="img" aria-label="Tabletă – fără fotografie">
+<rect width="400" height="400" fill="#f5f6f8"/>
+<circle cx="200" cy="168" r="96" fill="#fff" stroke="#e5e7eb" stroke-width="2"/>
+<g transform="translate(146 114) scale(4.5)" fill="none" stroke="#2563eb" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M10.5 18.5h3"/></g>
+<text x="200" y="316" text-anchor="middle" font-family="Inter,'Segoe UI',Roboto,Arial,sans-serif" font-size="28" font-weight="700" fill="#111827">Tabletă</text>
+<text x="200" y="348" text-anchor="middle" font-family="Inter,'Segoe UI',Roboto,Arial,sans-serif" font-size="16" fill="#5f6672">fără fotografie de produs</text>
+</svg>
